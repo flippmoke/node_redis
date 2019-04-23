@@ -395,17 +395,35 @@ describe('connection tests', function () {
                     });
                 });
 
-                it('clears the socket timeout after a connection has been established', function (done) {
+                it('clears connect_timeout on the socket timeout after a connection has been established', function (done) {
                     client = redis.createClient({
                         parser: parser,
                         connect_timeout: 1000
                     });
                     process.nextTick(function () {
                         assert.strictEqual(client.stream._idleTimeout, 1000);
+
                     });
                     client.on('connect', function () {
                         assert.strictEqual(client.stream._idleTimeout, -1);
                         assert.strictEqual(client.stream.listeners('timeout').length, 0);
+                        client.on('ready', done);
+                    });
+                });
+                
+                it('set the timeout to socket_timeout after a connection has been established', function (done) {
+                    client = redis.createClient({
+                        parser: parser,
+                        connect_timeout: 1000,
+                        socket_timeout: 2000
+                    });
+                    process.nextTick(function () {
+                        assert.strictEqual(client.stream._idleTimeout, 1000);
+
+                    });
+                    client.on('connect', function () {
+                        assert.strictEqual(client.stream._idleTimeout, 2000);
+                        assert.strictEqual(client.stream.listeners('timeout').length, 1);
                         client.on('ready', done);
                     });
                 });
