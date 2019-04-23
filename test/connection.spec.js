@@ -402,7 +402,6 @@ describe('connection tests', function () {
                     });
                     process.nextTick(function () {
                         assert.strictEqual(client.stream._idleTimeout, 1000);
-
                     });
                     client.on('connect', function () {
                         assert.strictEqual(client.stream._idleTimeout, -1);
